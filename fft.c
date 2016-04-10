@@ -4,6 +4,10 @@
 #include "math.h"
 #include "complex.h"
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 void fft(complex float* x, complex float* X, int N){
   complex float* xp;
   complex float* Xp;
