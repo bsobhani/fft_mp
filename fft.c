@@ -22,7 +22,7 @@ void dft(complex float* x, complex float* X, int N){
 }
 */
 
-void fft_depth(complex float* x, complex float* X, int N, int depth){
+void fft_depth(complex float* x, complex float* X, int N, int depth,int Nr){
   complex float* coeffs;
   complex float s;
   complex float s1;
@@ -34,7 +34,7 @@ void fft_depth(complex float* x, complex float* X, int N, int depth){
   coeffs=(complex float*) malloc(sizeof(complex float)*N/pow(2,depth));
   for(k=0; k<N; ++k){
     //fprintf(stderr,"%d %d\n",k,N);
-    z=-2*M_PI*I*k/N;
+    z=-2*M_PI*I*k/Nr;
     //z=-2*M_PI*I*k*p2d/N;
     for(i=0; i<N/pow(2,depth); ++i){
       //coeffs[i]=cexp(z*i*pow(2,depth));
@@ -58,39 +58,38 @@ void fft_depth(complex float* x, complex float* X, int N, int depth){
 }
 
 void fft(complex float* x, complex float* X, int N){
-  int depth=(int) (log(N)/log(2))/2;
-  fft_depth(x, X, N, depth);
+  complex float* xp;
+  complex float* Xp;
+  int depth;
+  int i;
+  int Np;
+  for(i=0; pow(2,i)<N; ++i);
+  Np=pow(2,i);
+  printf("%d %d\n", N, Np);
+  xp=(complex float*) malloc(Np*sizeof(complex float));
+  Xp=(complex float*) malloc(Np*sizeof(complex float));
+  for(i=0; i<N; ++i)
+    xp[i]=x[i];
+  for(i=N; i<Np; ++i)
+    xp[i]=0;
+  depth=(int) (log(Np)/log(2))/2;
+  fft_depth(xp, Xp, Np, depth,N);
+  for(i=0; i<N; ++i)
+    X[i]=Xp[i];
 }
 
-void ifft(complex float* x, complex float* X, int N){
+void ifft(complex float* X, complex float* x, int N){
   complex float* xr;
-  int depth=(int) (log(N)/log(2))/2;
+  //int depth=(int) (log(N)/log(2))/2;
   int i;
   xr=(complex float*) malloc(sizeof(complex float)*N);
-  fft_depth(X, xr, N, depth);
-  for(i=0; i<N; ++i){
-    x[i]=xr[N-i-1];
+  fft(X, xr, N);
+  x[0]=xr[0];
+  for(i=1; i<N; ++i){
+    x[i]=xr[N-i];
   }
   for(i=0; i<N; ++i){
     x[i]=x[i]/N;
   }
 }
 
-
-
-int test(){
-  complex float buffer[8];
-  complex float out[8];
-  int i;
-  buffer[0]=1; buffer[1]=2; buffer[2]=3; buffer[3]=4; buffer[4]=5; buffer[5]=6; buffer[6]=7; buffer[7]=8;
-
-  //dft(buffer,out,8);
-  
-  fft_depth(buffer,out,8,2);
-
-  
-  for(i=0; i<8; ++i){
-    printf("%f+j%f\n",creal(out[i]),cimag(out[i]));
-  }
-  return 0;
-}
