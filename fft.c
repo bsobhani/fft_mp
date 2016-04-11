@@ -25,7 +25,6 @@ void fft(complex float* x, complex float* X, int N){
   int xparg;
 
   complex float z0;
-  //complex float* czi;
 
   for(i=0; pow(2,i)<N; ++i);
   Np=pow(2,i);
@@ -41,35 +40,24 @@ void fft(complex float* x, complex float* X, int N){
   p2d=(int) pow(2,depth);
   N_over_p2d=Np/p2d;
   coeffs=(complex float*) malloc(sizeof(complex float)*Np/pow(2,depth));
-
-  //czi=(complex float*) malloc(p2d*sizeof(complex float));
   
   z0=-2*M_PI*I/N;
   for(k=0; k<N; ++k){
     z=z0*k;
-
-    /*for(i=0; i<p2d; ++i){
-      czi[i]=cexp(z*i);
-    }
-    */
     
     for(i=0; i<N_over_p2d; ++i){
       coeffs[i]=cexp(z*i*p2d);
     }
     
     s=0;
-    //xparg=0;
     for(i=0; i<p2d; ++i){
       s1=0;
       xparg=i;
       for(j=0; j<N_over_p2d; ++j){
-	//s1+=coeffs[j]*xp[ (int) (j*p2d+i)];
-	//s1+=coeffs[j]*xp[xparg];
-	s1+=cexp(z*j*p2d)*xp[xparg];
+	s1+=coeffs[j]*xp[xparg];
 	xparg+=p2d;
       }
       s+=s1*cexp(z*i);
-      //s+=s1*czi[i];
     }
     Xp[k]=s;
   }
