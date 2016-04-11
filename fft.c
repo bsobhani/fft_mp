@@ -21,7 +21,7 @@ void fft(complex float* x, complex float* X, int N){
   complex float z;
   int j,k;
   int p2d,N_over_p2d;
-  
+
   for(i=0; pow(2,i)<N; ++i);
   Np=pow(2,i);
   xp=(complex float*) malloc(Np*sizeof(complex float));
@@ -31,7 +31,7 @@ void fft(complex float* x, complex float* X, int N){
   for(i=N; i<Np; ++i)
     xp[i]=0;
   depth=(int) (log(Np)/log(2))/2;
-
+  
   p2d=(int) pow(2,depth);
   N_over_p2d=Np/p2d;
   coeffs=(complex float*) malloc(sizeof(complex float)*Np/pow(2,depth));
@@ -51,9 +51,13 @@ void fft(complex float* x, complex float* X, int N){
     }
     Xp[k]=s;
   }
-  
+
   for(i=0; i<N; ++i)
     X[i]=Xp[i];
+
+  free(coeffs);
+  free(xp);
+  free(Xp);
 }
 
 void ifft(complex float* X, complex float* x, int N){
@@ -68,5 +72,6 @@ void ifft(complex float* X, complex float* x, int N){
   for(i=0; i<N; ++i){
     x[i]=x[i]/N;
   }
+  free(xr);
 }
 
