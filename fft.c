@@ -8,67 +8,68 @@
 #define M_PI 3.14159265358979323846
 #endif
 
+
 void fft(complex float* x, complex float* X, int N){
-  complex float* xp;
-  complex float* Xp;
-  int depth;
-  int i;
-  int Np;
-  
-  complex float* coeffs;
-  complex float s;
-  complex float s1;
-  complex float z;
-  int j,k;
-  int p2d,N_over_p2d;
+  complex float W;
+  complex float** A1;
+  int j1,j0,k1,k0,r1,r2,i,m;
 
-  int xparg;
+  complex float** cp1;
 
-  complex float z0;
+  r1=(int) sqrt(N);
 
-  for(i=0; pow(2,i)<N; ++i);
-  Np=pow(2,i);
-  xp=(complex float*) malloc(Np*sizeof(complex float));
-  Xp=(complex float*) malloc(Np*sizeof(complex float));
+  while(N%r1!=0)
+    r1--;
+
+  /*fprintf(stderr,"%d %d %d\n",N,N%r1,r1);*/
   
-  for(i=0; i<N; ++i)
-    xp[i]=x[i];
-  for(i=N; i<Np; ++i)
-    xp[i]=0;
-  depth=(int) (log(Np)/log(2))/2;
-  
-  p2d=(int) pow(2,depth);
-  N_over_p2d=Np/p2d;
-  coeffs=(complex float*) malloc(sizeof(complex float)*Np/pow(2,depth));
-  
-  z0=-2*M_PI*I/N;
-  for(k=0; k<N; ++k){
-    z=z0*k;
-    
-    for(i=0; i<N_over_p2d; ++i){
-      coeffs[i]=cexp(z*i*p2d);
-    }
-    
-    s=0;
-    for(i=0; i<p2d; ++i){
-      s1=0;
-      xparg=i;
-      for(j=0; j<N_over_p2d; ++j){
-	s1+=coeffs[j]*xp[xparg];
-	xparg+=p2d;
-      }
-      s+=s1*cexp(z*i);
-    }
-    Xp[k]=s;
+  r2=N/r1;
+
+  A1=(complex float**) malloc(r1*sizeof(complex float*));
+
+  for(i=0; i<N; ++i){
+    X[i]=0;
   }
 
-  for(i=0; i<N; ++i)
-    X[i]=Xp[i];
+  for(i=0; i<r1; ++i){
+    A1[i]=(complex float*) malloc(r2*sizeof(complex float));
+    for(m=0; m<r2; ++m){
+      A1[i][m]=0;
+    }
+  }
 
-  free(coeffs);
-  free(xp);
-  free(Xp);
+  W=cexp(-2*M_PI*I/N);
+
+  cp1=(complex float**) malloc(r1*sizeof(complex float*));
+  for(j0=0; j0<r1; ++j0){
+    cp1[j0]=(complex float*) malloc(r1*sizeof(complex float));
+    for(k1=0; k1<r1; ++k1){
+      cp1[j0][k1]=cpow(W,j0*k1*r2);
+    }
+  }
+      
+  /*fprintf(stderr,"%d %d\n",r1,r2);*/
+
+  for(j0=0; j0<r1; ++j0){
+    for(k0=0; k0<r2; ++k0){
+      for(k1=0; k1<r1; ++k1){
+	/*A1[j0][k0]+=x[k1*r2+k0]*cpow(W,j0*k1*r2);*/
+	A1[j0][k0]+=x[k1*r2+k0]*cp1[j0][k1];
+      }
+    }  
+  }
+  for(j1=0; j1<r2; ++j1){
+    for(j0=0; j0<r1; ++j0){
+      for(k0=0; k0<r2; ++k0){
+	X[j1*r1+j0]+=A1[j0][k0]*cpow(W,(j1*r1+j0)*k0);
+      }     
+    }
+  }
+  
+  
+  return;
 }
+  
 
 void ifft(complex float* X, complex float* x, int N){
   complex float* xr;
