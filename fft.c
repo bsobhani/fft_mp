@@ -13,8 +13,11 @@
 void fft(complex float* x, complex float* X, int N){
   complex float W;
   complex float** A1;
-  int j1,j0,k1,k0,r1,r2,i,m;
+  int j1,j0,k1,k0,r1,r2,i,m,a1;
   complex float** cp1;
+
+  complex float b;
+  complex float inc;
   
   /* Determining reasonable values for r1 and r2 */
   r1=(int) sqrt(N);
@@ -57,9 +60,16 @@ void fft(complex float* x, complex float* X, int N){
 
   /* Computing the output ("A" in the Cooley-Tukey paper) */
   for(j1=0; j1<r2; ++j1){
+    a1=j1*r1;
     for(j0=0; j0<r1; ++j0){
+      a1+=j0;
+      b=1;
+      inc=cpow(W,a1);
       for(k0=0; k0<r2; ++k0){
-	X[j1*r1+j0]+=A1[j0][k0]*cpow(W,(j1*r1+j0)*k0);
+	/*X[j1*r1+j0]+=A1[j0][k0]*cpow(W,(j1*r1+j0)*k0);*/
+	/*X[a1]+=A1[j0][k0]*cpow(W,a1*k0);*/
+	X[a1]+=A1[j0][k0]*b;
+	b*=inc;
       }     
     }
   }
