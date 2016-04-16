@@ -1,6 +1,4 @@
 # fft
-A very simple fft implementation
-
 A C implementation of the Cooley-Tukey FFT.  
 
 Usage:
