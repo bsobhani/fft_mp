@@ -9,37 +9,34 @@
 #endif
 
 
+/* An implementation of the Cooley-Tukey FFT */
 void fft(complex float* x, complex float* X, int N){
   complex float W;
   complex float** A1;
   int j1,j0,k1,k0,r1,r2,i,m;
-
   complex float** cp1;
-
+  
+  /* Determining reasonable values for r1 and r2 */
   r1=(int) sqrt(N);
-
   while(N%r1!=0)
     r1--;
-
-  /*fprintf(stderr,"%d %d %d\n",N,N%r1,r1);*/
-  
   r2=N/r1;
-
-  A1=(complex float**) malloc(r1*sizeof(complex float*));
 
   for(i=0; i<N; ++i){
     X[i]=0;
   }
-
+  
+  A1=(complex float**) malloc(r1*sizeof(complex float*));
   for(i=0; i<r1; ++i){
     A1[i]=(complex float*) malloc(r2*sizeof(complex float));
     for(m=0; m<r2; ++m){
       A1[i][m]=0;
     }
   }
+  
+  W=cexp(-2*M_PI*I/N); /* Note: W=cexp(2*M_PI*I/N) in the Cooley-Tukey paper */
 
-  W=cexp(-2*M_PI*I/N);
-
+  /* Precomputing cpow(W,j0*k1*r2) */
   cp1=(complex float**) malloc(r1*sizeof(complex float*));
   for(j0=0; j0<r1; ++j0){
     cp1[j0]=(complex float*) malloc(r1*sizeof(complex float));
@@ -47,9 +44,8 @@ void fft(complex float* x, complex float* X, int N){
       cp1[j0][k1]=cpow(W,j0*k1*r2);
     }
   }
-      
-  /*fprintf(stderr,"%d %d\n",r1,r2);*/
 
+  /* Computing A1 */
   for(j0=0; j0<r1; ++j0){
     for(k0=0; k0<r2; ++k0){
       for(k1=0; k1<r1; ++k1){
@@ -58,6 +54,8 @@ void fft(complex float* x, complex float* X, int N){
       }
     }  
   }
+
+  /* Computing the output ("A" in the Cooley-Tukey paper) */
   for(j1=0; j1<r2; ++j1){
     for(j0=0; j0<r1; ++j0){
       for(k0=0; k0<r2; ++k0){
@@ -65,7 +63,15 @@ void fft(complex float* x, complex float* X, int N){
       }     
     }
   }
-  
+
+  /* Freeing data */
+  for(i=0; i<r1; ++i)
+    free(A1[i]);
+  free(A1);
+
+  for(i=0; i<r1; ++i)
+    free(cp1[i]);
+  free(cp1);
   
   return;
 }
