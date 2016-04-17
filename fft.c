@@ -52,8 +52,8 @@ void fft(complex float* x, complex float* X, int N){
   for(j0=0; j0<r1; ++j0){
     for(k0=0; k0<r2; ++k0){
       for(k1=0; k1<r1; ++k1){
-	/*A1[j0][k0]+=x[k1*r2+k0]*cpow(W,j0*k1*r2);*/
-	A1[j0][k0]+=x[k1*r2+k0]*cp1[j0][k1];
+	A1[j0][k0]+=x[k1*r2+k0]*cpow(W,j0*k1*r2);
+	/*A1[j0][k0]+=x[k1*r2+k0]*cp1[j0][k1];*/
       }
     }  
   }
@@ -62,7 +62,6 @@ void fft(complex float* x, complex float* X, int N){
   for(j1=0; j1<r2; ++j1){
     a1=j1*r1;
     for(j0=0; j0<r1; ++j0){
-      a1+=j0;
       b=1;
       inc=cpow(W,a1);
       for(k0=0; k0<r2; ++k0){
@@ -70,7 +69,7 @@ void fft(complex float* x, complex float* X, int N){
 	/*X[a1]+=A1[j0][k0]*cpow(W,a1*k0);*/
 	X[a1]+=A1[j0][k0]*b;
 	b*=inc;
-      }     
+      }
     }
   }
 
