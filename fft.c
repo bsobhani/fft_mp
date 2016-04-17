@@ -70,6 +70,7 @@ void fft(complex float* x, complex float* X, int N){
 	X[a1]+=A1[j0][k0]*b;
 	b*=inc;
       }
+      a1+=1;
     }
   }
 
