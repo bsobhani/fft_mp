@@ -13,11 +13,12 @@
 void fft(complex float* x, complex float* X, int N){
   complex float W;
   complex float** A1;
-  int j1,j0,k1,k0,r1,r2,i,m,a1;
+  int j1,j0,k1,k0,r1,r2,i,m,a1,jr,jkr;
   complex float** cp1;
 
   complex float b;
   complex float inc;
+  complex float cjr;
   
   /* Determining reasonable values for r1 and r2 */
   r1=(int) sqrt(N);
@@ -40,20 +41,31 @@ void fft(complex float* x, complex float* X, int N){
   W=cexp(-2*M_PI*I/N); /* Note: W=cexp(2*M_PI*I/N) in the Cooley-Tukey paper */
 
   /* Precomputing cpow(W,j0*k1*r2) */
+  jr=0;
+  jkr=0;
+  cjr=0;
   cp1=(complex float**) malloc(r1*sizeof(complex float*));
   for(j0=0; j0<r1; ++j0){
     cp1[j0]=(complex float*) malloc(r1*sizeof(complex float));
-    for(k1=0; k1<r1; ++k1){
-      cp1[j0][k1]=cpow(W,j0*k1*r2);
+    cjr=cpow(W,j0*r2);
+    cp1[j0][0]=1;
+    
+    for(k1=1; k1<r1; ++k1){
+      /* cp1[j0][k1]=cpow(W,j0*k1*r2); */
+      /* cp1[j0][k1]=cpow(W,jkr); */
+      /* cp1[j0][k1]=cpow(cjr,k1); */
+      cp1[j0][k1]=cp1[j0][k1-1]*cjr;
+      jkr+=jr;
     }
+    jr+=r2;
   }
 
   /* Computing A1 */
   for(j0=0; j0<r1; ++j0){
     for(k0=0; k0<r2; ++k0){
       for(k1=0; k1<r1; ++k1){
-	A1[j0][k0]+=x[k1*r2+k0]*cpow(W,j0*k1*r2);
-	/*A1[j0][k0]+=x[k1*r2+k0]*cp1[j0][k1];*/
+	/*A1[j0][k0]+=x[k1*r2+k0]*cpow(W,j0*k1*r2);*/
+	A1[j0][k0]+=x[k1*r2+k0]*cp1[j0][k1];
       }
     }  
   }

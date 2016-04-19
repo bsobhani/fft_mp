@@ -7,30 +7,36 @@
 void fft(complex float* x, complex float* X, int N);
 void ifft(complex float* X, complex float* x, int N);
 
+#define NSIG 10
 
 int main(void){
-  complex float x[16];
-  complex float X[16];
+  complex float x[1600];
+  complex float X[1600];
   int k;
-  x[0]=1; x[1]=2; x[2]=3; x[3]=4; x[4]=5; x[5]=6; x[6]=7; x[7]=8;
+  /*x[0]=1; x[1]=2; x[2]=3; x[3]=4; x[4]=5; x[5]=6; x[6]=7; x[7]=8;
   x[8]=1; x[9]=2; x[10]=3; x[11]=4; x[12]=5; x[13]=6; x[14]=7; x[15]=8;
+  */
+
+  for(k=0; k<NSIG; ++k){
+    x[k]=k;
+  }
   
   printf("Original signal:\n");
 
-  for(k=0; k<16; ++k)
+  for(k=0; k<NSIG; ++k)
     printf("%f + %fj\n",creal(x[k]),cimag(x[k]));
   
-  fft(x,X,16); /* FFT */
+  fft(x,X,NSIG); /* FFT */
 
   printf("\nFFT of signal:\n");
 
-  for(k=0; k<16; ++k)
+  for(k=0; k<NSIG; ++k)
     printf("%f + %fj\n",creal(X[k]),cimag(X[k]));
   
-  ifft(X,x,16); /* Inverse FFT */
+  ifft(X,x,NSIG); /* Inverse FFT */
   
   printf("\nInverse FFT of FFT of signal:\n");
-  for(k=0; k<16; ++k)
+  for(k=0; k<NSIG; ++k)
     printf("%f + %fj\n",creal(x[k]),cimag(x[k]));
   return 0;
 }
