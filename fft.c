@@ -3,6 +3,7 @@
 #include "string.h"
 #include "math.h"
 #include "complex.h"
+#include "omp.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
@@ -31,6 +32,8 @@ void fft(complex float* x, complex float* X, int N){
   }
   
   A1=(complex float**) malloc(r1*sizeof(complex float*));
+
+#pragma omp parallel for private(i,m)
   for(i=0; i<r1; ++i){
     A1[i]=(complex float*) malloc(r2*sizeof(complex float));
     for(m=0; m<r2; ++m){
@@ -59,8 +62,8 @@ void fft(complex float* x, complex float* X, int N){
     }
     jr+=r2;
   }
-
   /* Computing A1 */
+#pragma omp parallel for private(j0,k0,k1)
   for(j0=0; j0<r1; ++j0){
     for(k0=0; k0<r2; ++k0){
       for(k1=0; k1<r1; ++k1){
@@ -71,6 +74,7 @@ void fft(complex float* x, complex float* X, int N){
   }
 
   /* Computing the output ("A" in the Cooley-Tukey paper) */
+#pragma omp parallel for private(j0,j1,k0,a1,inc,b)
   for(j1=0; j1<r2; ++j1){
     a1=j1*r1;
     for(j0=0; j0<r1; ++j0){
@@ -105,9 +109,11 @@ void ifft(complex float* X, complex float* x, int N){
   xr=(complex float*) malloc(sizeof(complex float)*N);
   fft(X, xr, N);
   x[0]=xr[0];
+#pragma omp parallel for private(i)
   for(i=1; i<N; ++i){
     x[i]=xr[N-i];
   }
+#pragma omp parallel for private(i)
   for(i=0; i<N; ++i){
     x[i]=x[i]/N;
   }
