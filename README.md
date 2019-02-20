@@ -1,5 +1,5 @@
 # fft
-A C implementation of the Cooley-Tukey FFT.  
+A C implementation of the Cooley-Tukey FFT, with OpenMP support. 
 
 Usage:  
 1) Include fft.c in your project.  
