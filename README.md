@@ -1,4 +1,4 @@
-# fft
+# fft_mp
 A C implementation of the Cooley-Tukey FFT, with OpenMP support. 
 
 Usage:  
